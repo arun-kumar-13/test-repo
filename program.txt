@@ -1,0 +1,133 @@
+Import libraries:
+ 
+import tensorflow
+import os
+import glob 
+import matplotlib pyplot as plt
+import numpy as np
+
+Keras API:
+
+import keras
+from keras.models import Sequential
+from keras.layers import Dense,Dropout,Flatten
+from keras.layers import Conv2D,MaxPooling2D
+from keras.layers import Activation,AveragePooling2D,BatchNormalization
+from keras.preprocessing image import ImageDataGenerator
+
+Dataset location in google drive:
+
+train_dir="/content/drive/My Drive/crop/crop project/train"
+test_dir="/content/drive/My Drive/crop/crop projest/valid"
+
+Functions to get count of images
+
+def get_files(directory);
+  if not os.path.exists(directory);
+	return 0
+  count=0
+  for current_path,dirs,files in os.walk(directory):
+    for dr in dirs:
+        count+=len(glob.glob(os.path.join(current_path,dr+"/*")))
+  return count 
+
+train_samples=get_files(train_dir)
+num_classes=len(glob.glob(train_dir+"/*"))
+test_samples=get_files(test_dir)
+print(num_classes,"classes")
+print(train_samples,"Train images")
+print(test_samples,"Test images")
+
+#preprocessing data with parameters
+train_datagen=ImageDataGenerator(rescale=1./255,
+				 shear_range=0.2,
+                                 zoom_range=0.2,horizontal_flip=True)
+test_datagen=ImageDataGenerator(rescale=1./255)
+
+#set height and width and color of input image
+img_width,img_height=256,256
+input_shape=(img_width,img_height,3)
+batch_size=64
+train_generator=train_datagen.flow_from_directory(train_dir,
+				   shuffle=True,
+				   target_size=(img_width,img_height),
+				   batch_size=batch_size)
+test_generator=test_datagen.flow_from_directory(test_dir,
+			          shuffle=True,
+				  target_size=(img_width,img_height),
+				  batch_size=batch_size)
+
+#the name of the 10 classes
+train_generator.class_indices
+
+#CNN building
+model=Sequential()
+model.add(Conv2D(32,(5,5),input_shape=input_shape,activation='relu'))
+model.add(MaxPooling2D(pool_size=(3,3)))
+model.add(Conv2D(64,(3,3),activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(128,(3,3),activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(512,activation='relu'))
+# model.add(BatchNormalization())
+model.add(Dropout(0.25))
+model.add(Dense(num_classes,activation='softmax'))
+model.summary()
+
+#preprocess image to obtain image shape
+from tensorflow.keras.preprocessing import image
+# import numpy as np
+img1=image.load_img('Location of the image')
+plt.imshow(img1);
+img1=image.load_img('Location of the image',target_size=(256,256))
+img=image.img_to_array(img1)
+img=img/255
+img=np.expand_dims(img,axis=0)
+print('Preprocessed input image shape--')
+print(img.shape)
+print(img)
+
+#training the model
+validation_generator=train_datagen.flow_from_directory(train_dir,
+					target_size=(img_height,img_width),
+					batch_size=batch_size)
+opt=tensorflow.keras.optimizers.Adam(learning_rate=0.001)
+model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['accuracy'])
+
+train=model.fit(train_generator,
+                          epochs=20,
+                          steps_per_epoch=train_generator.samples//batch_size,                                                
+                          validation_data=validation_generator,
+                          validation_steps=validation_generator.samples//batch_size, verbose=1 )
+
+#save model
+from keras.models import load_model
+model.save('A2_FINAL_MODEL.h5')
+
+#loading model and predict
+from keras.models import load_model
+model=load_model('/content/A2_FINAL_MODEL.h5')
+
+#Mention name of the disease into list
+Classes=['Coffee__healthy','Coffee__red spider mite','Coffee__Rust',
+	 'Corn__Cercospora_leaf_spot Gray_leaf_spot',
+         'Corn__Common_rust','Corn__Healthy','Corn__Northern_Leaf_Blight',
+	 'Cotton__bacterial_blight','Cotton__curl_virus','Cotton__fussarium_wilt','Cotton_healthy',
+	 'Rice__Brown_spot','Rice__Healthy','Rice__Hispa','Rice__Leaf_Blast',
+         'Sugarcane__Bacterial Blight','Sugarcane__Healthy','Sugarcane__Red Rot',
+         'Wheat__Brown_rust','Wheat__Healthy','Wheat__Yellow_rust']
+
+#Pre-Processing test data same as train data
+from tensorflow.keras.preprocessing import image
+def prepare(img_path):
+  img = image.load_img(img_path,target_size=(256,256))
+  x = image.img_to_array(img)
+  x= x/255
+  return np.expand_dims(x,axis=0)
+
+result=model.predict([prepare('Location of the image')])
+disease=image.load_img('Location of the image')
+plt.imshow(disease)
+print('The detected leaf disease is')
+print(Classes[np.argmax(result)])

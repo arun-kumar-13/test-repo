@@ -1,0 +1,145 @@
+#bill division
+def bonAppetit(bill, k, b):
+
+  charge=0
+  sum=0
+  for i in range(len(bill)):
+     sum+=bill[i]
+  
+   #for i in range(len(bill)):
+     if i!=k:
+         charge+=bill[i]
+  charged=sum/2
+  #print(charge)
+  act=charge/2
+  #print(act)
+  x=charged-act
+  if b==act:
+    print("Bon Appetit")
+  else:
+    print(int(x))
+  
+    
+#no of item
+n=int(input())
+#anna didn't eat the item
+k=int(input())
+#bill charge for anna
+bill = list(map(int, input().rstrip().split()))
+b=int(input())
+bonAppetit(bill, k, b)
+
+#A very big sum
+ar_count=int(input())
+ar = list(map(int, input().rstrip().split()))
+sum=0
+for i in ar:
+  sum+=i
+print(sum)
+
+#plus-minus
+n = int(input().strip())
+arr = list(map(int, input().rstrip().split()))
+count1=0
+count2=0
+count3=0
+for i in arr:
+  if i>0:
+    count1+=1
+  elif i<0:
+    count2+=1
+  else:
+    count3+=1
+print(format(count1/n,".6f"))
+print(format(count2/n,".6f"))
+print(format(count3/n,".6f"))
+
+#hurdle race
+n=int(input())
+k=int(input())
+height= list(map(int, input().rstrip().split()))
+height.sort()
+x=max(height)
+if x>k:
+  print(x-k)
+else:
+  print('0')
+
+#compare the triplets
+import itertools
+a = list(map(int, input().rstrip().split()))
+b = list(map(int, input().rstrip().split()))
+count1=0
+count2=0
+arr=[]
+for (x, y) in itertools.zip_longest(a, b):
+    if x>y:
+       count1+=1
+    elif x==y:
+       pass
+    elif x<y:
+       count2+=1
+arr.append(count1)  
+arr.append(count2)
+print(arr)
+
+#diagonal difference
+n = int(input().strip())
+arr = []
+for _ in range(n):
+     arr.append(list(map(int, input().rstrip().split())))
+p=0
+s=0
+for i in range(len(arr)):
+  for j in range(len(arr)):
+    if i==j:
+      p+=arr[i][j]
+    if ((i+j)==(n-1)):
+      s+=arr[i][j]
+result=abs(p-s)
+print(result)
+
+#grading students
+from math import ceil
+grades_count = int(input().strip())
+grades = []
+for _ in range(grades_count):
+    grades_item = int(input().strip())
+    grades.append(grades_item)
+for i in grades:
+  x=5*ceil(i/5)
+  if i<38:
+    print(i)
+  elif x-i<3:
+    print(x)
+  elif x-i>=3:
+    print(i)
+
+#divisible sum pairs
+first_multiple_input = input().rstrip().split()
+n = int(first_multiple_input[0])
+k = int(first_multiple_input[1])
+ar = list(map(int, input().rstrip().split()))
+c=0
+for i in range(n):
+  for j in range(i+1,n):
+    if (ar[i]+ar[j])%k==0:
+                c+=1
+print(c)
+
+#between two sets
+a=[2,4]
+b=[16,32,96]
+ct=0
+for i in range(max(a),min(b)+1):
+  for j in a:
+    if i%j!=0:
+      break
+  else:
+    for k in b:
+      if k%i!=0:
+        break
+    else:
+      ct+=1
+print(ct)
+
